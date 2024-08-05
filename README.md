@@ -38,25 +38,25 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 http://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com:8000/docs
 
 ### API Endpoints
-Books
+#### Books:
 POST /books: Add a new book
 GET /books: Retrieve all books
 GET /books/{id}: Retrieve a specific book by its ID
 PUT /books/{id}: Update a book's information by its ID
 DELETE /books/{id}: Delete a book by its ID
 
-Reviews
+#### Reviews:
 POST /books/{id}/reviews: Add a review for a book
 GET /books/{id}/reviews: Retrieve all reviews for a book
 
-Recommendations
+#### Recommendations:
 POST /recommendations: Get book recommendations based on user preferences
 
-Summary
+#### Summary:
 GET /books/{id}/summary: Get a summary and aggregated rating for a book
 POST /generate-summary: Generate a summary for a given book content
 
-Machine Learning Model
+#### Machine Learning Model:
 The project includes a machine learning model to recommend books based on genre and average rating. The model is trained on a sample dataset of books.
 
 Model Used
