@@ -15,21 +15,103 @@ This project is a Book Management API built with FastAPI. It allows you to manag
 
 ### Prerequisites
 
-- Python 3.9+
-- PostgreSQL
-- AWS account
+- AWS account with an EC2 instance running Amazon Linux 2
+- PostgreSQL database
+- Python 3.7+
+- Nginx
+- Uvicorn
+- Certbot (optional for HTTPS with Let's Encrypt)
 
 ### Clone the repository
-git clone https://github.com/callmeblaze/book_management.git
+git clone https://github.com/callmeblaze/book_management.git<br>
 cd book_management
 
 ### Set up the virtual environment and install dependencies
-python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\\Scripts\\activate`
-pip install -r requirements.txt
-Configure the database
-Set up a PostgreSQL database on AWS RDS.
+python -m venv venv<br>
+source venv/bin/activate  # On Windows, use `venv\\Scripts\\activate`<br>
+pip install -r requirements.txt<br>
+Configure the database<br>
+Set up a PostgreSQL database on AWS RDS.<br>
 Create a config.py file in the root directory with the following content:
+
+### Configure Nginx
+Create a new Nginx configuration file:
+
+    sudo nano /etc/nginx/conf.d/fastapi.conf
+
+Add the following configuration:<br>
+I tried to obtain SSL certificate from Certbot but amazon linux2 did not support it, after a long try to obtain different SSL certificate,<br> I created a Self-Signed Certificate using Diffie-Hellman Parameters<br><br>
+Create Diffie-Hellman Parameters(Not Recommended for Production):
+
+    sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+    
+nginx
+
+    server {
+    listen 80;
+    server_name ec2-13-53-168-255.eu-north-1.compute.amazonaws.com;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+    }
+
+    server {
+    listen 443 ssl;
+    server_name ec2-13-53-168-255.eu-north-1.compute.amazonaws.com;
+
+    ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+    ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Security headers
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload";
+        add_header X-Content-Type-Options nosniff;
+        add_header X-Frame-Options DENY;
+        add_header X-XSS-Protection "1; mode=block";
+        add_header Referrer-Policy same-origin;
+        add_header Permissions-Policy "geolocation=(self)";
+    }
+    }
+
+
+Restart Nginx
+
+    sudo systemctl restart nginx
+
+Check Nginx Status
+
+    sudo systemctl status nginx
+
+stop Nginx 
+
+    sudo systemctl stop nginx
+
+Start Uvicorn
+Run Uvicorn in the background:
+
+    nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+
+Check Uvicorn Status:
+
+    ps aux | grep uvicorn
+
+Check Logs for Errors
+
+    sudo tail -f /var/log/nginx/error.log
+    sudo tail -f /var/log/nginx/access.log
+
+#### Access the Application
+Try accessing your application using both HTTP and HTTPS:
+
+HTTP: http://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com<br>
+HTTPS: https://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com<br>
 
 ### Run the application
 uvicorn main:app --host 0.0.0.0 --port 8000
@@ -39,14 +121,14 @@ http://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com:8000/docs
 
 ### API Endpoints
 #### Books:
-POST /books: Add a new book
-GET /books: Retrieve all books
-GET /books/{id}: Retrieve a specific book by its ID
-PUT /books/{id}: Update a book's information by its ID
+POST /books: Add a new book<br>
+GET /books: Retrieve all books<br>
+GET /books/{id}: Retrieve a specific book by its ID<br>
+PUT /books/{id}: Update a book's information by its ID<br>
 DELETE /books/{id}: Delete a book by its ID
 
 #### Reviews:
-POST /books/{id}/reviews: Add a review for a book
+POST /books/{id}/reviews: Add a review for a book<br>
 GET /books/{id}/reviews: Retrieve all reviews for a book
 
 #### Recommendations:
@@ -80,7 +162,7 @@ SSH into the EC2 instance and restart the FastAPI service
 
 
 ### Acknowledgments
-FastAPI: https://fastapi.tiangolo.com/
-SQLAlchemy: https://www.sqlalchemy.org/
-Ollama: https://ollama.com/
+FastAPI: https://fastapi.tiangolo.com/<br>
+SQLAlchemy: https://www.sqlalchemy.org/<br>
+Ollama: https://ollama.com/<br>
 GitHub Actions: https://github.com/features/actions
