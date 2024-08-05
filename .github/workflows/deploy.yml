@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - master  # or master, depending on your default branch
+      - master
 
 jobs:
   deploy:
@@ -13,33 +13,26 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
-
-    - name: Install dependencies
+    - name: Set up SSH
       run: |
-        python -m venv venv
-        source venv/bin/activate
-        pip install -r requirements.txt
+        mkdir -p ~/.ssh
+        echo "${{ secrets.AWS_KEY }}" > ~/.ssh/aws_key.pem
+        chmod 600 ~/.ssh/aws_key.pem
 
     - name: Copy files to EC2
       env:
-        KEY: ${{ secrets.AWS_KEY }}
         HOST: ${{ secrets.AWS_HOST }}
         USER: ec2-user
       run: |
-        scp -i $KEY -r * $USER@$HOST:/home/ec2-user/book_management
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/aws_key.pem -r * $USER@$HOST:/home/ec2-user/book_management
 
     - name: SSH into EC2 and deploy
       env:
-        KEY: ${{ secrets.AWS_KEY }}
         HOST: ${{ secrets.AWS_HOST }}
         USER: ec2-user
       run: |
-        ssh -i $KEY $USER@$HOST << 'EOF'
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/aws_key.pem $USER@$HOST << 'EOF'
         cd /home/ec2-user/book_management
-        source venv/bin/activate
-        uvicorn main:app --host 0.0.0.0 --port 8000
+        pkill -f uvicorn || true
+        nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
         EOF
