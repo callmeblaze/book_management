@@ -63,6 +63,7 @@ python train_model.py
 The project is deployed to an AWS EC2 instance. GitHub Actions is used for Continuous Integration and Deployment.
 
 GitHub Actions Workflow
+code branch: master
 A GitHub Actions workflow (deploy.yml) is set up to automate the deployment process. The workflow performs the following steps:
 
 Check out the code
