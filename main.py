@@ -11,6 +11,8 @@ from schemas import Book, BookCreate, BookUpdate, Review, ReviewCreate, SummaryR
 from typing import List
 from sqlalchemy import text
 import logging
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from passlib.context import CryptContext
 
 app = FastAPI()
 
@@ -19,17 +21,14 @@ DATABASE_URL = f"postgresql+asyncpg://{config.DATABASE_USERNAME}:{config.DATABAS
 engine = create_async_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-
 async def get_db():
     async with SessionLocal() as session:
         yield session
-
 
 LLAMA3_API_URL = "http://localhost:11434/api/generate"
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
 
 def generate_summary(text):
     payload = {
@@ -48,12 +47,24 @@ def generate_summary(text):
         logger.error(f"Error from Llama3 API: {response.status_code} - {response.text}")
         return None
 
-
 model = joblib.load('book_recommendation_model.pkl')
 
+security = HTTPBasic()
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
+    username = config.BASIC_AUTH_USERNAME
+    password_hash = config.BASIC_AUTH_PASSWORD_HASH
+    if credentials.username == username and pwd_context.verify(credentials.password, password_hash):
+        return credentials.username
+    raise HTTPException(
+        status_code=401,
+        detail="Incorrect username or password",
+        headers={"WWW-Authenticate": "Basic"},
+    )
 
 @app.post("/books", response_model=Book)
-async def create_book(book: BookCreate, db: AsyncSession = Depends(get_db)):
+async def create_book(book: BookCreate, db: AsyncSession = Depends(get_db), username: str = Depends(get_current_username)):
     new_book = BookModel(**book.dict())
     new_book.summary = generate_summary(book.title + " " + book.author + " " + book.genre)
     db.add(new_book)
@@ -61,25 +72,22 @@ async def create_book(book: BookCreate, db: AsyncSession = Depends(get_db)):
     await db.refresh(new_book)
     return new_book
 
-
 @app.get("/books", response_model=List[Book])
-async def get_books(db: AsyncSession = Depends(get_db)):
+async def get_books(db: AsyncSession = Depends(get_db), username: str = Depends(get_current_username)):
     result = await db.execute(select(BookModel))
     books = result.scalars().all()
     return books
 
-
 @app.get("/books/{id}", response_model=Book)
-async def get_book(id: int, db: AsyncSession = Depends(get_db)):
+async def get_book(id: int, db: AsyncSession = Depends(get_db), username: str = Depends(get_current_username)):
     book_result = await db.execute(select(BookModel).filter(BookModel.id == id))
     book = book_result.scalar_one_or_none()
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
     return book
 
-
 @app.put("/books/{id}", response_model=Book)
-async def update_book(id: int, book_update: BookUpdate, db: AsyncSession = Depends(get_db)):
+async def update_book(id: int, book_update: BookUpdate, db: AsyncSession = Depends(get_db), username: str = Depends(get_current_username)):
     book_result = await db.execute(select(BookModel).filter(BookModel.id == id))
     book = book_result.scalar_one_or_none()
     if not book:
@@ -90,9 +98,8 @@ async def update_book(id: int, book_update: BookUpdate, db: AsyncSession = Depen
     await db.refresh(book)
     return book
 
-
 @app.delete("/books/{id}")
-async def delete_book(id: int, db: AsyncSession = Depends(get_db)):
+async def delete_book(id: int, db: AsyncSession = Depends(get_db), username: str = Depends(get_current_username)):
     book_result = await db.execute(select(BookModel).filter(BookModel.id == id))
     book = book_result.scalar_one_or_none()
     if not book:
@@ -101,9 +108,8 @@ async def delete_book(id: int, db: AsyncSession = Depends(get_db)):
     await db.commit()
     return {"message": "Book deleted successfully"}
 
-
 @app.post("/books/{id}/reviews", response_model=Review)
-async def create_review(id: int, review: ReviewCreate, db: AsyncSession = Depends(get_db)):
+async def create_review(id: int, review: ReviewCreate, db: AsyncSession = Depends(get_db), username: str = Depends(get_current_username)):
     book_result = await db.execute(select(BookModel).filter(BookModel.id == id))
     book = book_result.scalar_one_or_none()
     if not book:
@@ -115,18 +121,16 @@ async def create_review(id: int, review: ReviewCreate, db: AsyncSession = Depend
     await db.refresh(new_review)
     return new_review
 
-
 @app.get("/books/{id}/reviews", response_model=List[Review])
-async def get_reviews(id: int, db: AsyncSession = Depends(get_db)):
+async def get_reviews(id: int, db: AsyncSession = Depends(get_db), username: str = Depends(get_current_username)):
     result = await db.execute(select(ReviewModel).filter(ReviewModel.book_id == id))
     reviews = result.scalars().all()
     if not reviews:
         raise HTTPException(status_code=404, detail="Reviews not found")
     return reviews
 
-
 @app.get("/books/{id}/summary", response_model=SummaryResponse)
-async def get_summary(id: int, db: AsyncSession = Depends(get_db)):
+async def get_summary(id: int, db: AsyncSession = Depends(get_db), username: str = Depends(get_current_username)):
     book_result = await db.execute(select(BookModel).filter(BookModel.id == id))
     book = book_result.scalar_one_or_none()
     if not book:
@@ -136,17 +140,15 @@ async def get_summary(id: int, db: AsyncSession = Depends(get_db)):
     rating = sum([review.rating for review in reviews]) / len(reviews) if reviews else None
     return SummaryResponse(summary=book.summary, rating=rating)
 
-
 @app.post("/generate-summary", response_model=SummaryResponse)
-async def generate_summary_endpoint(text: str):
+async def generate_summary_endpoint(text: str, username: str = Depends(get_current_username)):
     summary = generate_summary(text)
     if not summary:
         raise HTTPException(status_code=500, detail="Failed to generate summary")
     return {"summary": summary}
 
-
 @app.post("/recommendations", response_model=List[Recommendation])
-async def get_recommendations(preferences: UserPreferences, db: AsyncSession = Depends(get_db)):
+async def get_recommendations(preferences: UserPreferences, db: AsyncSession = Depends(get_db), username: str = Depends(get_current_username)):
     query = text("""
     SELECT books.id, books.title, books.author, books.genre, AVG(reviews.rating) as avg_rating
     FROM books
@@ -184,7 +186,6 @@ async def get_recommendations(preferences: UserPreferences, db: AsyncSession = D
             break
 
     return recommendations
-
 
 if __name__ == "__main__":
     import uvicorn
