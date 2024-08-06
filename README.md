@@ -1,7 +1,7 @@
 
 # Book Management API
 
-This project is a Book Management API built with FastAPI. It allows you to manage books, add reviews, and get book recommendations based on user preferences.
+This project is a Book Management API built with FastAPI. It allows you to manage books, add reviews, and get book recommendations based on user preferences and use llama3 AI model to generate summaries for books.
 
 ## Important Note!!!
 I attempted to obtain an SSL certificate from Certbot, but Amazon Linux 2 did not support it. After trying unsuccessfully to obtain a different SSL certificate, I created a self-signed certificate using Diffie-Hellman Parameters. Since I am using this self-signed SSL certificate with Nginx, a warning will appear when accessing the public DNS, but this is acceptable for testing purposes. For a more secure SSL certificate, I could use certbot-nginx, but this would require purchasing or owning a domain name, which I am not able to do at the moment.<br><br>
