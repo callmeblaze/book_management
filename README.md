@@ -132,6 +132,12 @@ to check status: sudo systemctl status nginx<br>
 if necessary:<br>
 nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
 
+### pytest
+As a bonus, I have created a `tests` directory to handle test data. This directory contains test files for both the main application and the AI model. The tests cover various endpoints, including book creation, retrieval, updating, deletion, and ML-based book recommendation and AI-based summary generation. To run the tests, use the following command:
+
+```bash
+pytest
+```
 ### API Endpoints
 #### Books:
 POST /books: Add a new book<br>
