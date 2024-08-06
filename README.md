@@ -111,17 +111,20 @@ Check Logs for Errors
     sudo tail -f /var/log/nginx/error.log
     sudo tail -f /var/log/nginx/access.log
 
-#### Access the Application
+###  Access the Application via browser
 Try accessing your application using both HTTP and HTTPS:
 
-HTTP: http://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com<br>
-HTTPS: https://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com<br>
+#### swagger UI
+HTTP: http://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com/docs<br>
+HTTPS: https://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com/docs<br>
 
-### Run the application
-uvicorn main:app --host 0.0.0.0 --port 8000
+### Run the application in server through Nginx
+to start: sudo systemctl start nginx<br>
+to stop: sudo systemctl stop nginx<br>
+to check status: sudo systemctl status nginx<br>
 
-### swagger UI browser
-http://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com:8000/docs
+if necessary:<br>
+nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
 
 ### API Endpoints
 #### Books:
