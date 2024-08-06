@@ -151,7 +151,7 @@ POST /books/{id}/reviews: Add a review for a book<br>
 GET /books/{id}/reviews: Retrieve all reviews for a book
 
 #### Recommendations:
-POST /recommendations: Get book recommendations based on user preferences
+POST /recommendations: Get book recommendations based on user preferences, the data input should be a part of books already available in the DB
 
 #### Summary:
 GET /books/{id}/summary: Get a summary and aggregated rating for a book
