@@ -121,6 +121,9 @@ Try accessing your application using both HTTP and HTTPS:
 HTTP: http://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com/docs<br>
 HTTPS: https://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com/docs<br>
 
+#### BASIC AUTH
+since i have integrated basic auth the user needs to authorize by entering username and password
+
 ### Run the application in server through Nginx
 to start: sudo systemctl start nginx<br>
 to stop: sudo systemctl stop nginx<br>
