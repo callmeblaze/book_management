@@ -160,11 +160,65 @@ POST /generate-summary: Generate a summary for a given book content
 #### Machine Learning Model:
 The project includes a machine learning model to recommend books based on genre and average rating. The model is trained on a sample dataset of books.
 
-Model Used
+#### Model Used
 We used the Random Forest Regressor model from the scikit-learn library for the recommendation system.
 To train the model, run the train_model.py script:
 python train_model.py
 
+### Llama3 (Ollama)
+
+This project uses the Llama3 API to generate text summaries.
+
+#### Endpoint: `/generate-summary`
+
+**Request:**
+- **Method:** POST
+- **URL:** `/generate-summary`
+- **Headers:** Basic Auth with username and password
+- **Body:**
+  ```json
+  {
+    "text": "Your text to summarize here"
+  }
+
+Response:
+Success:
+json
+```
+{
+  "summary": "Generated summary text here"
+}
+```
+Failure:
+json
+```
+{
+  "detail": "Failed to generate summary"
+}
+```
+Example
+Curl:
+```
+curl -X POST "http://localhost:8000/generate-summary" \
+     -H "Content-Type: application/json" \
+     -u fastapi:gogreen \
+     -d '{"text": "This is the text I want to summarize."}'
+```  
+Postman:
+
+- **Method:** POST
+- **URL:** `[/generate-summary](http://localhost:8000/generate-summary)`
+- **Headers:** Basic Auth with username and password  Content-Type: application/json
+- **Body:**
+json
+```
+{
+  "text": "This is the text I want to summarize."
+}
+```
+
+#### Pytest
+As a bonus, a Test directory has been created to handle test data.
 
 ### Deployment
 The project is deployed to an AWS EC2 instance. GitHub Actions is used for Continuous Integration and Deployment.
