@@ -38,9 +38,9 @@ source venv/bin/activate  # On Windows, use `venv\\Scripts\\activate`<br>
 pip install -r requirements.txt<br>
 Configure the database<br>
 Set up a PostgreSQL database on AWS RDS.<br>
-Create a config.py file in the root directory with the following content:
+Create a local.env file in the root directory with all sensitive data
 
-### Configure Nginx
+### Configure Nginx (server side)
 
 Create a new Nginx configuration file:
 
