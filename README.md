@@ -6,8 +6,6 @@ This project is a Book Management API built with FastAPI. It allows you to manag
 ## Important Note!!!
 I attempted to obtain an SSL certificate from Certbot, but Amazon Linux 2 did not support it. After trying unsuccessfully to obtain a different SSL certificate, I created a self-signed certificate using Diffie-Hellman Parameters. Since I am using this self-signed SSL certificate with Nginx, a warning will appear when accessing the public DNS, but this is acceptable for testing purposes. For a more secure SSL certificate, I could use certbot-nginx, but this would require purchasing or owning a domain name, which I am not able to do at the moment.<br><br>
 
-### code available in master branch:
-https://github.com/callmeblaze/book_management/tree/master
 
 ## Features
 
@@ -29,7 +27,7 @@ https://github.com/callmeblaze/book_management/tree/master
 - Certbot (optional for HTTPS with Let's Encrypt)
 
 ### Clone the repository
-git clone https://github.com/callmeblaze/book_management.git<br>
+git clone https://github.com/callmeblaze/book_management/tree/master<br>
 cd book_management
 
 ### Set up the virtual environment and install dependencies
