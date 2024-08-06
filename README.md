@@ -171,13 +171,12 @@ The project is deployed to an AWS EC2 instance. GitHub Actions is used for Conti
 
 GitHub Actions Workflow
 code branch: master
-A GitHub Actions workflow (deploy.yml) is set up to automate the deployment process. The workflow performs the following steps:
+A GitHub Actions workflow (deploy.yml) is set up to automate the deployment process. The workflow performs the following steps:<br>
 
-Check out the code
-Set up Python
-Install dependencies
-Copy files to the EC2 instance
-SSH into the EC2 instance and restart the FastAPI service
+Check out the code<br>
+Set up Python<br>
+Copy files to the EC2 instance<br>
+SSH into the EC2 instance and restart the FastAPI service<br>
 
 
 ### Acknowledgments
