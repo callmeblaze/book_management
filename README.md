@@ -11,7 +11,7 @@ git clone https://github.com/callmeblaze/book_management/tree/master<br>
 cd book_management
 
 ### Running application
-click the below URL to access the swaggerUI of running application(warning will appear due to self signed SSL cert, but user can advance through)<br>
+click the below URL to access the swaggerUI of running application(A warning will appear due to self signed SSL cert, but user can advance through)<br>
 public DNS url: HTTPS: https://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com/docs
 
 ## Features
