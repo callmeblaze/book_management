@@ -24,7 +24,7 @@ I attempted to obtain an SSL certificate from Certbot, but Amazon Linux 2 did no
 - Python 3.7+
 - Nginx
 - Uvicorn
-- Certbot (optional for HTTPS with Let's Encrypt)
+- llama3 (ollama)
 
 ### Clone the repository
 git clone https://github.com/callmeblaze/book_management/tree/master<br>
