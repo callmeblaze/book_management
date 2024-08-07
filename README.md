@@ -12,7 +12,7 @@ cd book_management
 
 ### Running application
 click the below URL to access the swaggerUI of running application(warning will appear due to self signed SSL cert, but user can advance through)<br>
-HTTPS: https://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com/docs
+public DNS url: HTTPS: https://ec2-13-53-168-255.eu-north-1.compute.amazonaws.com/docs
 
 ## Features
 
