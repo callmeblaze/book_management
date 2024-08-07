@@ -215,8 +215,6 @@ json
 }
 ```
 
-#### Pytest
-As a bonus, a Test directory has been created to handle test data.
 
 ### Deployment
 The project is deployed to an AWS EC2 instance. GitHub Actions is used for Continuous Integration and Deployment.
